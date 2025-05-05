@@ -1,0 +1,81 @@
+#include <iostream>
+#include <queue>
+#include <vector>
+#include <climits>
+using namespace std;
+
+struct node {
+    int x, y;
+    int d;  
+};
+
+int n, m;
+int start_x, start_y, end_x, end_y;
+int a[110][110];
+int dist[110][110][4];  
+int dx[4] = { -1, 1, 0, 0 };
+int dy[4] = { 0, 0, -1, 1 };
+
+void clean() {
+    for (int i = 0; i < 110; i++) {
+        for (int j = 0; j < 110; j++) {
+            for (int k = 0; k < 4; k++) {
+                dist[i][j][k] = INT_MAX;
+            }
+        }
+    }
+    for (int i = 0; i < 4; i++) {
+        dist[start_x][start_y][i] = 0;
+    }
+}
+
+int bfs() {
+    queue<node> q;
+    for (int dir = 0; dir < 4; dir++) {
+        q.push({ start_x, start_y, dir });
+    }
+    
+    while (!q.empty()) {
+        node cur = q.front();
+        q.pop();
+        
+        if (cur.x == end_x && cur.y == end_y) {
+            return dist[cur.x][cur.y][cur.d];
+        }
+        
+        for (int i = 0; i < 4; i++) {
+            int nx = cur.x + dx[i];
+            int ny = cur.y + dy[i];
+            int new_t = dist[cur.x][cur.y][cur.d];
+            
+            if (cur.d != i) {
+                new_t++;
+            }
+            if (nx >= 0 && nx < n && ny >= 0 && ny < m && a[nx][ny] == 0) {
+                if (new_t < dist[nx][ny][i]) {
+                    dist[nx][ny][i] = new_t;
+                    q.push({ nx, ny, i });
+                }
+            }
+        }
+    }
+    return -1;  
+}
+
+int main() {
+    cin >> n >> m;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            cin >> a[i][j];
+        }
+    }
+    cin >> start_x >> start_y >> end_x >> end_y;
+    start_x--; start_y--;  
+    end_x--; end_y--;
+    
+    clean();
+    int ans = bfs();
+    cout << ans << endl;
+    
+    return 0;
+}
